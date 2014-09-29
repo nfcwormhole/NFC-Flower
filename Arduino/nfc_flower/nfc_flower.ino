@@ -1,17 +1,14 @@
-#include <dht11.h>
-#include <EEPROM.h>
-
-dht11 DHT11;
-#define DHT11PIN 12 //define DHT11 pin
-#define RELAY 2    //define relay pin
 /* Copyright 2013 Ten Wong, wangtengoo7@gmail.com  
 *  
 */
+//#include <dht11.h>
+#include <EEPROM.h>
 
-/*********************************************************
-** sample: when reset the rf430, it will write the uri to 
-** rf430 tag.
-***********************************************************/
+//dht11 DHT11;
+//#define DHT11PIN 12 //define DHT11 pin
+//#define RELAY 2    //define relay pin
+
+
 #if ARDUINO >= 100
  #include "Arduino.h"
 #else
@@ -23,11 +20,11 @@ dht11 DHT11;
 #include <NdefRecord.h>
 
 
-//#define IRQ   (7)
-//#define RESET (6)  
+#define IRQ   (7)
+#define RESET (6)  
 //use UNO
-#define IRQ   (3)
-#define RESET (4)
+//#define IRQ   (3)
+//#define RESET (4)
 int led = 13;
 RF430CL330H_Shield nfc(IRQ, RESET);
 
@@ -55,8 +52,8 @@ void setup(void)
     Serial.println("Hello!");
     pinMode(led, OUTPUT); 
     digitalWrite(led, HIGH);
-    pinMode(RELAY,OUTPUT);
-    digitalWrite(RELAY,LOW);
+//    pinMode(RELAY,OUTPUT);
+//    digitalWrite(RELAY,LOW);
     nfc.begin();
     if(EEPROM.read(address+2)!=1)
     {
@@ -67,13 +64,13 @@ void setup(void)
     /// init data here
     Restore_Default();//write sensor data to DNFC TAG
     //Serial.println(EEPROM.read(address));
-   // Serial.println(EEPROM.read(address+1));
+    //Serial.println(EEPROM.read(address+1));
     //enable interrupt 1
-    attachInterrupt(1, RF430_Interrupt, FALLING);
+    attachInterrupt(IRQ, RF430_Interrupt, FALLING);
     Serial.println("Wait for read or write...");
-    Serial.println("DHT11 TEST PROGRAM ");
-    Serial.print("LIBRARY VERSION: ");
-    Serial.println(DHT11LIB_VERSION);
+    //Serial.println("DHT11 TEST PROGRAM ");
+    //Serial.print("LIBRARY VERSION: ");
+    //Serial.println(DHT11LIB_VERSION);
 }
 
 void loop(void) 
@@ -122,15 +119,15 @@ void loop(void)
         nfc.Write_Register(CONTROL_REG, INT_ENABLE + INTO_DRIVE + RF_ENABLE);
 
         //re-enable INTO
-        attachInterrupt(1, RF430_Interrupt, FALLING);
+        attachInterrupt(IRQ, RF430_Interrupt, FALLING);
     }
 //
-    if (DHT11.humidity < EEPROM.read(address)) //auto control relay watering
-    {
-      digitalWrite(RELAY,HIGH);
-      delay(2000);
-      digitalWrite(RELAY,LOW);
-    }
+    //if (DHT11.humidity < EEPROM.read(address)) //auto control relay watering
+    //{
+    //  digitalWrite(RELAY,HIGH);
+    //  delay(2000);
+    //  digitalWrite(RELAY,LOW);
+    //}
     if (loop_num == 50) //5s refresh tag
     {
         Restore_Default();
@@ -149,7 +146,7 @@ void loop(void)
 void RF430_Interrupt()            
 {
     into_fired = 1;
-    detachInterrupt(1);//cancel interrupt
+    detachInterrupt(IRQ);//cancel interrupt
 }
 
 boolean ByteArrayCompare(byte a[], byte b[], uint8_t array_size)
@@ -162,15 +159,18 @@ boolean ByteArrayCompare(byte a[], byte b[], uint8_t array_size)
 
 void Restore_Default()
 {
-    int chk = DHT11.read(DHT11PIN);
-    NdefRecord records[4];
+    //int chk = DHT11.read(DHT11PIN);
+    NdefRecord records[5];
     /** here get data from sensor **/
     //get sensor data
     byte exData0[] = {60}; //humidity 60%  form sensor   
     byte exData1[] = {24}; //temperature 24 C  form sensor 
     byte exData2[] = {50}; //humidity 50%  warm line 50%
-    exData0[0] = DHT11.humidity;
-    exData1[0] = DHT11.temperature;
+    //exData0[0] = DHT11.humidity;
+    //exData1[0] = DHT11.temperature;
+    long a = analogRead(A2);
+    long b = (a*100)/900;
+    exData0[0] = b;
     Serial.println(exData0[0]);
     Serial.println(exData1[0]);
     //Serial.println( DHT11.temperature);
@@ -178,6 +178,7 @@ void Restore_Default()
     records[1].createExternal("flower", "humidity", exData0, sizeof(exData0));
     records[2].createExternal("flower", "temperature", exData1, sizeof(exData1));
     records[3].createExternal("flower", "setting", exData2, sizeof(exData2));
+    records[4].createApplicationRecord("com.flower.nfcaction");
     
     NdefMessage msg(records, sizeof(records)/sizeof(NdefRecord));
     uint16_t msg_length = msg.getByteArrayLength();
@@ -203,9 +204,9 @@ void flower_operator()
             {
                 Serial.println("water"); 
                 //deal with relay
-               digitalWrite(RELAY,HIGH);
-               delay(2000);
-               digitalWrite(RELAY,LOW);
+               //digitalWrite(RELAY,HIGH);
+               //delay(2000);
+               //digitalWrite(RELAY,LOW);
             }
             //do water flower operate
         }
