@@ -1,0 +1,14 @@
+Android/NFC_Flower/.settings/org.eclipse.core.resources.prefs
+Android/NFC_Flower/bin/AndroidManifest.xml
+Android/NFC_Flower/bin/classes.dex
+*.class
+Android/NFC_Flower/bin/dexedLibs/android-support-v4-57b84b6a4ae39e30e1a7bad5963f30b0.jar
+Android/NFC_Flower/bin/res/crunch/drawable-hdpi/block_bg2.9.png
+Android/NFC_Flower/bin/res/crunch/drawable-hdpi/ic_launcher.png
+Android/NFC_Flower/bin/res/crunch/drawable-mdpi/ic_launcher.png
+Android/NFC_Flower/bin/res/crunch/drawable-xhdpi/ic_launcher.png
+Android/NFC_Flower/bin/res/crunch/drawable-xxhdpi/ic_launcher.png
+Android/NFC_Flower/bin/resources.ap_
+Android/NFC_Flower/bin/NFC_Flower.apk
+Android/NFC_Flower/gen/com/flower/nfcaction/BuildConfig.java
+Android/NFC_Flower/gen/com/flower/nfcaction/R.java
