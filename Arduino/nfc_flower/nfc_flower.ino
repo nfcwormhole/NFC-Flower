@@ -1,12 +1,13 @@
 /* Copyright 2013 Ten Wong, wangtengoo7@gmail.com  
 *  
 */
-//#include <dht11.h>
+#include <dht.h>
 #include <EEPROM.h>
 
-//dht11 DHT11;
-//#define DHT11PIN 12 //define DHT11 pin
+dht DHT11;
+#define DHT11PIN 12 //define DHT11 pin
 //#define RELAY 2    //define relay pin
+#define  MOISTURE_PIN A2    //define relay pin
 
 
 #if ARDUINO >= 100
@@ -19,7 +20,7 @@
 #include <NdefMessage.h>
 #include <NdefRecord.h>
 
-
+//use elecfreaks DTAG BOT
 #define IRQ   (7)
 #define RESET (6)  
 //use UNO
@@ -61,11 +62,11 @@ void setup(void)
       EEPROM.write(address+1, 30);//temperature
       EEPROM.write(address+2,1);
     }
-    /// init data here
+    // init data here
     Restore_Default();//write sensor data to DNFC TAG
-    //Serial.println(EEPROM.read(address));
-    //Serial.println(EEPROM.read(address+1));
-    //enable interrupt 1
+    Serial.println(EEPROM.read(address));
+    Serial.println(EEPROM.read(address+1));
+
     attachInterrupt(IRQ, RF430_Interrupt, FALLING);
     Serial.println("Wait for read or write...");
     //Serial.println("DHT11 TEST PROGRAM ");
@@ -75,8 +76,8 @@ void setup(void)
 
 void loop(void) 
 {
-    //hum = EEPROM.read(address);
-    //temp = EEPROM.read(address+1);
+    hum = EEPROM.read(address);
+    temp = EEPROM.read(address+1);
     
     if(into_fired)
     {
@@ -159,26 +160,29 @@ boolean ByteArrayCompare(byte a[], byte b[], uint8_t array_size)
 
 void Restore_Default()
 {
-    //int chk = DHT11.read(DHT11PIN);
-    NdefRecord records[5];
+    DHT11.read11(DHT11PIN);
     /** here get data from sensor **/
     //get sensor data
     byte exData0[] = {60}; //humidity 60%  form sensor   
     byte exData1[] = {24}; //temperature 24 C  form sensor 
-    byte exData2[] = {50}; //humidity 50%  warm line 50%
-    //exData0[0] = DHT11.humidity;
-    //exData1[0] = DHT11.temperature;
-    long a = analogRead(A2);
+    byte exData2[] = {50}; //moisture 
+    byte exData3[] = {50}; //moisture 50%  warm line 50%
+    exData0[0] = DHT11.humidity;
+    exData1[0] = DHT11.temperature;
+    long a = analogRead(MOISTURE_PIN);
     long b = (a*100)/900;
-    exData0[0] = b;
-    Serial.println(exData0[0]);
-    Serial.println(exData1[0]);
-    //Serial.println( DHT11.temperature);
+    exData2[0] = b;
+    Serial.print("humidity:");Serial.println(exData0[0]);
+    Serial.print("temperature:");Serial.println(exData1[0]);
+    Serial.print("moisture:");Serial.println(exData2[0]);
+    Serial.print("moisture line:");Serial.println(exData3[0]);
+    NdefRecord records[6];
     records[0].createUri("http://www.elecfreaks.com");
     records[1].createExternal("flower", "humidity", exData0, sizeof(exData0));
     records[2].createExternal("flower", "temperature", exData1, sizeof(exData1));
-    records[3].createExternal("flower", "setting", exData2, sizeof(exData2));
-    records[4].createApplicationRecord("com.flower.nfcaction");
+    records[3].createExternal("flower", "moisture", exData2, sizeof(exData2));
+    records[4].createExternal("flower", "setting", exData3, sizeof(exData3));
+    records[5].createApplicationRecord("com.flower.nfcaction");
     
     NdefMessage msg(records, sizeof(records)/sizeof(NdefRecord));
     uint16_t msg_length = msg.getByteArrayLength();
@@ -204,9 +208,9 @@ void flower_operator()
             {
                 Serial.println("water"); 
                 //deal with relay
-               //digitalWrite(RELAY,HIGH);
-               //delay(2000);
-               //digitalWrite(RELAY,LOW);
+                //digitalWrite(RELAY,HIGH);
+                //delay(2000);
+                //digitalWrite(RELAY,LOW);
             }
             //do water flower operate
         }

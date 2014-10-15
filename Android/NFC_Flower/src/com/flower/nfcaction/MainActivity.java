@@ -87,7 +87,29 @@ public class MainActivity extends Activity {
             // display theme
             TextView hum = (TextView) panels[0].findViewById(R.id.humidity_textview_info);
             hum.setText(humidity[0] + "%");
-            // hum.setText(Integer.toHexString(humidity[1])+"%");
+            // hum.setText(Integer.toHexString(humidity[1]) + "%");
+        }
+        if (Arrays.equals(records[2].getType(), "flower:temperature".getBytes())) {
+            Log.d("sam test", "equals flower:temperature");
+            byte[] temperature = records[2].getPayload();
+            for (byte b : temperature) {
+                Log.d("sam test", "b=" + Integer.toHexString(b));
+            }
+            
+            // display theme
+            TextView tem = (TextView) panels[0].findViewById(R.id.temperature_textview_info);
+            tem.setText(temperature[0] + "°C");
+        }
+        if (Arrays.equals(records[3].getType(), "flower:moisture".getBytes())) {
+            Log.d("sam test", "equals flower:moisture");
+            byte[] moisture = records[3].getPayload();
+            for (byte b : moisture) {
+                Log.d("sam test", "b=" + Integer.toHexString(b));
+            }
+            
+            // display theme
+            TextView tem = (TextView) panels[0].findViewById(R.id.moisture_textview_info);
+            tem.setText(moisture[0] + "%");
         }
     }
     
