@@ -7,7 +7,10 @@
 package com.flower.nfcaction;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -26,12 +29,17 @@ import android.widget.TextView;
 import java.util.Arrays;
 
 public class MainActivity extends Activity {
-    
+    private static final String TAG = "MainActivity";
     private ViewPager navigationView;
     
     private View[] panels = new View[3];
     
     private String[] titles;
+    TextView hum;
+    TextView tem;
+    TextView moi;
+    
+    SharedPreferences sp;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +50,16 @@ public class MainActivity extends Activity {
         
         navigationView.setAdapter(new NavigationAdapter());
         titles = getResources().getStringArray(R.array.titles);
+        
+        hum = (TextView) panels[0].findViewById(R.id.humidity_textview_info);
+        tem = (TextView) panels[0].findViewById(R.id.temperature_textview_info);
+        moi = (TextView) panels[0].findViewById(R.id.moisture_textview_info);
+        
+        Context ctx = MainActivity.this;
+        sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
+        hum.setText(sp.getString("hum", "40%"));
+        tem.setText(sp.getString("tem", "28°C"));
+        moi.setText(sp.getString("moi", "80%"));
     }
     
     @Override
@@ -85,9 +103,7 @@ public class MainActivity extends Activity {
             }
             
             // display theme
-            TextView hum = (TextView) panels[0].findViewById(R.id.humidity_textview_info);
             hum.setText(humidity[0] + "%");
-            // hum.setText(Integer.toHexString(humidity[1]) + "%");
         }
         if (Arrays.equals(records[2].getType(), "flower:temperature".getBytes())) {
             Log.d("sam test", "equals flower:temperature");
@@ -97,7 +113,6 @@ public class MainActivity extends Activity {
             }
             
             // display theme
-            TextView tem = (TextView) panels[0].findViewById(R.id.temperature_textview_info);
             tem.setText(temperature[0] + "°C");
         }
         if (Arrays.equals(records[3].getType(), "flower:moisture".getBytes())) {
@@ -108,8 +123,7 @@ public class MainActivity extends Activity {
             }
             
             // display theme
-            TextView tem = (TextView) panels[0].findViewById(R.id.moisture_textview_info);
-            tem.setText(moisture[0] + "%");
+            moi.setText(moisture[0] + "%");
         }
     }
     
@@ -217,4 +231,21 @@ public class MainActivity extends Activity {
         return true;
     }
     
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.d(TAG, "onNewIntent");
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop!");
+        Editor editor = sp.edit();
+        editor.putString("hum", hum.getText().toString());
+        editor.putString("tem", tem.getText().toString());
+        editor.putString("moi", moi.getText().toString());
+        editor.commit();
+    }
 }
