@@ -7,14 +7,19 @@
 package com.flower.nfcaction;
 
 import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -40,10 +45,12 @@ public class MainActivity extends Activity {
     TextView moi;
     
     SharedPreferences sp;
+    BroadcastReceiver receiver;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate!");
         setContentView(R.layout.activity_main);
         
         initView();
@@ -60,11 +67,42 @@ public class MainActivity extends Activity {
         hum.setText(sp.getString("hum", "40%"));
         tem.setText(sp.getString("tem", "28°C"));
         moi.setText(sp.getString("moi", "80%"));
+        
+        update();
     }
+    
+    private void update() {
+        Uri uri = Uri.parse("http://mloader-mloader.stor.sinaapp.com/NFC_Flower/NFC_Flower.apk");
+        DownloadManager.Request r = new DownloadManager.Request(uri);
+        r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "NFC_Flower.apk");
+        r.setDescription("NFC Flower");
+        r.setTitle("NFC_Flower.apk");
+        r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        
+        final DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        final long refernece = dm.enqueue(r);
+        
+        IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        receiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                long myDwonloadID = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+                if (refernece == myDwonloadID) {
+                    Intent install = new Intent(Intent.ACTION_VIEW);
+                    Uri downloadFileUri = dm.getUriForDownloadedFile(refernece);
+                    install.setDataAndType(downloadFileUri,
+                            "application/vnd.android.package-archive");
+                    install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(install);
+                }
+            }
+        };
+        registerReceiver(receiver, filter);
+    }
+    
     
     @Override
     public void startActivity(Intent intent) {
-        Log.d("sam test", "startActivity");
+        Log.d("TAG", "startActivity");
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         super.startActivity(intent);
     }
@@ -72,7 +110,7 @@ public class MainActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
-        
+        Log.d(TAG, "onResume!");
         Intent intent = null;
         intent = getIntent();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
@@ -87,6 +125,12 @@ public class MainActivity extends Activity {
             }
         }
         
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause!");
     }
     
     private void user_definded_task(NdefMessage msgs) {
@@ -247,5 +291,12 @@ public class MainActivity extends Activity {
         editor.putString("tem", tem.getText().toString());
         editor.putString("moi", moi.getText().toString());
         editor.commit();
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy");
+        unregisterReceiver(receiver);
     }
 }
