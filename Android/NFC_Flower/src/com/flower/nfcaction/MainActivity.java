@@ -6,6 +6,9 @@
 
 package com.flower.nfcaction;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -14,6 +17,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -30,6 +36,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Arrays;
 
@@ -46,7 +53,8 @@ public class MainActivity extends Activity {
     
     SharedPreferences sp;
     BroadcastReceiver receiver;
-    
+    int newVerCode = 2;
+    String newVerName = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +76,77 @@ public class MainActivity extends Activity {
         tem.setText(sp.getString("tem", "28°C"));
         moi.setText(sp.getString("moi", "80%"));
         
-        update();
+        ConnectivityManager connectMgr =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        
+        NetworkInfo info = connectMgr.getActiveNetworkInfo();
+        
+        if (info != null) {
+            if (info.getType() == ConnectivityManager.TYPE_WIFI) {
+                Log.d(TAG, "WIFI");
+                
+                // 比较服务器版本//在 onCreate函数中调用
+                if (getServerVerCode()) {
+                    int vercode = getVerCode(this);
+                    if (newVerCode > vercode) {
+                        // doNewVersionUpdate();//发现新版本更新
+                        // update();
+                        Toast.makeText(getApplicationContext(), "有新版本", Toast.LENGTH_LONG)
+                        .show();// 没有新版本
+                    } else {
+                        Toast.makeText(getApplicationContext(), "目前是最新版本，感谢您的支持", Toast.LENGTH_LONG)
+                                .show();// 没有新版本
+                    }
+                }
+                
+                
+            }
+        }
+    }
+    
+    private boolean getServerVerCode() {
+        try {
+             //取得服务器地址和接口文件名
+            String verjson = NetworkTool.getContent("http://mloader.sinaapp.com/NFC_Flower_version.html" + "NFC_Flower.apk");
+            JSONArray array = new JSONArray(verjson);
+            if (array.length() > 0) {
+                JSONObject obj = array.getJSONObject(0);
+                try {
+                     newVerCode = Integer.parseInt(obj.getString("verCode"));
+                     newVerName = obj.getString("verName");
+                } catch (Exception e) {
+                     newVerCode = -1;
+                     newVerName = "";
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
+        return true;
+    }
+    
+    public static int getVerCode(Context context) {
+        int verCode = -1;
+        try {
+            verCode =
+                    context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
+        } catch (NameNotFoundException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return verCode;
+    }
+    
+    public static String getVerName(Context context) {
+        String verName = "";
+        try {
+            verName =
+                    context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (NameNotFoundException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return verName;
     }
     
     private void update() {
@@ -297,6 +375,6 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
-        unregisterReceiver(receiver);
+        // unregisterReceiver(receiver);
     }
 }
