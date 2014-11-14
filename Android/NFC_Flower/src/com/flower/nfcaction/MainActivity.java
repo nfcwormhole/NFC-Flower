@@ -6,13 +6,15 @@
 
 package com.flower.nfcaction;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.JSONException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -38,6 +40,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 
 public class MainActivity extends Activity {
@@ -55,6 +64,8 @@ public class MainActivity extends Activity {
     BroadcastReceiver receiver;
     int newVerCode = 2;
     String newVerName = "";
+    String resultStr = "";
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,47 +95,185 @@ public class MainActivity extends Activity {
         if (info != null) {
             if (info.getType() == ConnectivityManager.TYPE_WIFI) {
                 Log.d(TAG, "WIFI");
-                
                 // 比较服务器版本//在 onCreate函数中调用
-                if (getServerVerCode()) {
-                    int vercode = getVerCode(this);
-                    if (newVerCode > vercode) {
-                        // doNewVersionUpdate();//发现新版本更新
-                        // update();
-                        Toast.makeText(getApplicationContext(), "有新版本", Toast.LENGTH_LONG)
-                        .show();// 没有新版本
-                    } else {
-                        Toast.makeText(getApplicationContext(), "目前是最新版本，感谢您的支持", Toast.LENGTH_LONG)
-                                .show();// 没有新版本
+                try {
+                    if (getServerVerCode()) {
+                        ;
                     }
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
-                
-                
             }
         }
     }
     
-    private boolean getServerVerCode() {
+    void isupdate() {
+        int vercode = getVerCode(this);
+        if (newVerCode > vercode) {
+            // doNewVersionUpdate();//发现新版本更新
+            // update();
+            doNewVersionUpdate();
+            Toast.makeText(getApplicationContext(), "有新版本", Toast.LENGTH_LONG).show();// 没有新版本
+        } else {
+            Toast.makeText(getApplicationContext(), "目前是最新版本，感谢您的支持", Toast.LENGTH_LONG).show();// 没有新版本
+        }
+    }
+    
+    private void doNewVersionUpdate() {
+        int verCode = getVerCode(this);
+        String verName = getVerName(this);
+        StringBuffer sb = new StringBuffer();
+        sb.append("当前版本:");
+        sb.append(verName);
+        sb.append(" Code:");
+        sb.append(verCode);
+        sb.append(", 发现新版本");
+        sb.append(newVerName);
+        sb.append(" Code:");
+        sb.append(newVerCode);
+        sb.append(",是否更新?");
+        Dialog dialog = new AlertDialog.Builder(this).setTitle("软件更新").setMessage(sb.toString())
+        // 设置内容
+                .setPositiveButton("更新",// 设置确定按钮
+                        new DialogInterface.OnClickListener() {
+                            
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                update();
+                            }
+                            
+                        }).setNegativeButton("暂不更新", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // 点击"取消"按钮之后退出程序
+                        finish();
+                    }
+                }).create();// 创建
+        // 显示对话框
+        dialog.show();
+    }
+    
+    private boolean getServerVerCode() throws JSONException {
+        // try {
+        // // 取得服务器地址和接口文件名
+        // String verjson =
+        // NetworkTool.getContent("http://mloader.sinaapp.com/NFC_Flower_version.html");
+        // // Log.d(TAG, verjson);
+        // JSONArray array = new JSONArray(verjson);
+        // if (array.length() > 0) {
+        // JSONObject obj = array.getJSONObject(0);
+        // try {
+        // newVerCode = Integer.parseInt(obj.getString("verCode"));
+        // newVerName = obj.getString("verName");
+        // } catch (Exception e) {
+        // newVerCode = -1;
+        // newVerName = "";
+        // return false;
+        // }
+        // }
+        // } catch (Exception e) {
+        // // Log.e(TAG, e.getMessage());
+        // Log.e(TAG, "get Server Error");
+        // return false;
+        // }
+        
+        // TODO Auto-generated method stub
+        Thread visitBaiduThread = new Thread(new VisitWebRunnable());
+        visitBaiduThread.start();
+        // try {
+        // visitBaiduThread.join();
+        // if (!resultStr.equals("")) {
+        // Log.d(TAG, "resultStr" + resultStr);
+        // String verjson = resultStr;
+        // JSONArray array = new JSONArray(verjson);
+        // if (array.length() > 0) {
+        // JSONObject obj = array.getJSONObject(0);
+        // try {
+        // newVerCode = Integer.parseInt(obj.getString("verCode"));
+        // newVerName = obj.getString("verName");
+        // Log.d(TAG, "newVerCode:" + newVerCode);
+        // Log.d(TAG, "newVerName:" + newVerName);
+        // Log.d(TAG, "appname:" + obj.getString("appname"));
+        // Log.d(TAG, "apkname:" + obj.getString("apkname"));
+        // } catch (Exception e) {
+        // newVerCode = -1;
+        // newVerName = "";
+        // return false;
+        // }
+        // }
+        // }
+        // } catch (InterruptedException e) {
+        // // TODO Auto-generated catch block
+        // e.printStackTrace();
+        // }
+        return true;
+    }
+    
+    class VisitWebRunnable implements Runnable {
+        
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            String data = getURLResponse("http://mloader.sinaapp.com/NFC_Flower_version.html");
+            resultStr = data;
+            runOnUiThread(new Runnable() {
+                
+                @Override
+                public void run() {
+                    //Toast.makeText(getApplicationContext(), "拿到url 数据！", Toast.LENGTH_LONG).show();// 没有新版本
+                    isupdate();
+                }
+            });
+        }
+        
+    }
+    
+    /**
+     * 获取指定URL的响应字符串
+     * 
+     * @param urlString
+     * @return
+     */
+    private String getURLResponse(String urlString) {
+        HttpURLConnection conn = null; // 连接对象
+        InputStream is = null;
+        String resultData = "";
         try {
-             //取得服务器地址和接口文件名
-            String verjson = NetworkTool.getContent("http://mloader.sinaapp.com/NFC_Flower_version.html" + "NFC_Flower.apk");
-            JSONArray array = new JSONArray(verjson);
-            if (array.length() > 0) {
-                JSONObject obj = array.getJSONObject(0);
+            URL url = new URL(urlString); // URL对象
+            conn = (HttpURLConnection) url.openConnection(); // 使用URL打开一个链接
+            conn.setDoInput(true); // 允许输入流，即允许下载
+            conn.setDoOutput(true); // 允许输出流，即允许上传
+            conn.setUseCaches(false); // 不使用缓冲
+            conn.setRequestMethod("GET"); // 使用get请求
+            is = conn.getInputStream(); // 获取输入流，此时才真正建立链接
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader bufferReader = new BufferedReader(isr);
+            String inputLine = "";
+            while ((inputLine = bufferReader.readLine()) != null) {
+                resultData += inputLine + "\n";
+            }
+            
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            if (is != null) {
                 try {
-                     newVerCode = Integer.parseInt(obj.getString("verCode"));
-                     newVerName = obj.getString("verName");
-                } catch (Exception e) {
-                     newVerCode = -1;
-                     newVerName = "";
-                    return false;
+                    is.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-            return false;
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
-        return true;
+        
+        return resultData;
     }
     
     public static int getVerCode(Context context) {
@@ -155,7 +304,7 @@ public class MainActivity extends Activity {
         r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "NFC_Flower.apk");
         r.setDescription("NFC Flower");
         r.setTitle("NFC_Flower.apk");
-        r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
         
         final DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
         final long refernece = dm.enqueue(r);
