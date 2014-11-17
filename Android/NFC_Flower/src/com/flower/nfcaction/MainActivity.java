@@ -41,6 +41,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -220,7 +221,8 @@ public class MainActivity extends Activity {
                 
                 @Override
                 public void run() {
-                    //Toast.makeText(getApplicationContext(), "拿到url 数据！", Toast.LENGTH_LONG).show();// 没有新版本
+                    // Toast.makeText(getApplicationContext(), "拿到url 数据！",
+                    // Toast.LENGTH_LONG).show();// 没有新版本
                     isupdate();
                 }
             });
@@ -305,6 +307,15 @@ public class MainActivity extends Activity {
         r.setDescription("NFC Flower");
         r.setTitle("NFC_Flower.apk");
         r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+        
+        // if apk exist, del it.
+        File file =
+                new File(
+                        Environment
+                                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                        "NFC_Flower.apk");
+        if (file.exists())
+            file.delete();
         
         final DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
         final long refernece = dm.enqueue(r);
