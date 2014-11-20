@@ -53,11 +53,6 @@ public class AppOnlineUpdate {
         dm = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
     }
     
-    
-    public void CompareVersion(Listener listener) {
-        new Thread(new MyRunnable(listener)).start();
-    }
-    
     public interface Listener {
         /**
          * Called when have new version
@@ -68,6 +63,10 @@ public class AppOnlineUpdate {
          * Called when have not new version
          */
         public void onVersion(String currentVersion);
+    }
+    
+    public void compareVersion(Listener listener) {
+        new Thread(new MyRunnable(listener)).start();
     }
     
     private class MyRunnable implements Runnable {
@@ -94,7 +93,7 @@ public class AppOnlineUpdate {
         }
     }
     
-    public void Download() {
+    public void downloadApk() {
         deleteOldFile();
         
         Uri uri = Uri.parse(APKURL);
@@ -106,7 +105,7 @@ public class AppOnlineUpdate {
         dmID = dm.enqueue(r);
     }
     
-    public boolean Install(Intent intent) {
+    public boolean installApk(Intent intent) {
         long myDwonloadID = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
         if (dmID == myDwonloadID) {
             Intent install = new Intent(Intent.ACTION_VIEW);

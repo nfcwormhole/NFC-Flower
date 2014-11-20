@@ -279,7 +279,7 @@ public class MainActivity extends Activity {
     
     private void appUpdate() {
         apkUp = new AppOnlineUpdate(this);
-        apkUp.CompareVersion(new Listener() {
+        apkUp.compareVersion(new Listener() {
             
             @Override
             public void onNewVersion(final String currentVersion, final String newVersion) {
@@ -303,7 +303,7 @@ public class MainActivity extends Activity {
         IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
         receiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
-                apkUp.Install(intent);
+                apkUp.installApk(intent);
             }
         };
         registerReceiver(receiver, filter);
@@ -322,7 +322,7 @@ public class MainActivity extends Activity {
                             
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                apkUp.Download();
+                                apkUp.downloadApk();
                             }
                             
                         }).setNegativeButton("暂不更新", new DialogInterface.OnClickListener() {
