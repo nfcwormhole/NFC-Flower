@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 sam, xiao_nie@163.com
+ * Copyright 2014 sam, xiao_nie@163.com wangtengoo7@gmail.com
  * https://play.google.com/store/apps/details?id=com.flower.nfcaction More info :
  * http://www.elecfreaks.com
  */

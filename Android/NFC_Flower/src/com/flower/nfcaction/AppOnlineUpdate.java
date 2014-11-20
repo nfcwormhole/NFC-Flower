@@ -1,3 +1,7 @@
+/*
+ * Copyright 2014 wangtengoo7@gmail.com
+ */
+
 package com.flower.nfcaction;
 
 import org.json.JSONArray;
@@ -39,10 +43,10 @@ public class AppOnlineUpdate {
     
     
     private Context mContext;
-    private String curVerName = "";
-    private String newVerName = "";
+    private String curVerName;
+    private String newVerName = "1.0";
     private int curVerCode;
-    private int newVerCode;
+    private int newVerCode = 1;
     private long dmID;
     private DownloadManager dm;
     
@@ -150,6 +154,8 @@ public class AppOnlineUpdate {
             conn.setDoOutput(true);
             conn.setUseCaches(false);
             conn.setRequestMethod("GET");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
             is = conn.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader bufferReader = new BufferedReader(isr);
@@ -191,8 +197,8 @@ public class AppOnlineUpdate {
                     // Log.d(TAG, "appname:" + obj.getString("appname"));
                     // Log.d(TAG, "apkname:" + obj.getString("apkname"));
                 } catch (Exception e) {
-                    newVerCode = -1;
-                    newVerName = "";
+                    newVerCode = 1;
+                    newVerName = "1.0";
                     return false;
                 }
             }
