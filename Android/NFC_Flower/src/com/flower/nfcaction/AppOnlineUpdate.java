@@ -26,8 +26,8 @@ public class AppOnlineUpdate {
     
     // version json url
     private final static String VERURL = "http://mloader.sinaapp.com/NFC_Flower_version.html";
-    // apk download url
     
+    // apk download url
     private final static String APKURL =
             "http://mloader-mloader.stor.sinaapp.com/NFC_Flower/NFC_Flower.apk";
     
