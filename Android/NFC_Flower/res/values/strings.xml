@@ -15,7 +15,12 @@
     <string name="settting_write_tag">Save</string>
     <string name="write_failed">Failed to write，please try again later!</string>
     <string name="write_succ">Tag has been written successfully!</string>
-
+    <string name="up_title">Software Update</string>
+    <string name="up_old">Current version:</string>
+    <string name="up_new">,new version</string>
+    <string name="up_is_update">,update?</string>
+    <string name="up_update">Update</string>
+    <string name="up_later">Later</string>
     <string-array name="titles">
         <item>info</item>
         <item>setting</item>

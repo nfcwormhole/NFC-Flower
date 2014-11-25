@@ -311,21 +311,21 @@ public class MainActivity extends Activity {
     
     private void doNewVersionUpdate(String currentVersion, String newVersion) {
         StringBuffer sb = new StringBuffer();
-        sb.append("当前版本:");
+        sb.append(getText(R.string.up_old));
         sb.append(currentVersion);
-        sb.append(", 发现新版本");
+        sb.append(getText(R.string.up_new));
         sb.append(newVersion);
-        sb.append(",是否更新?");
+        sb.append(getText(R.string.up_is_update));
         Dialog dialog =
-                new AlertDialog.Builder(this).setTitle("软件更新").setMessage(sb.toString())
-                        .setPositiveButton("更新", new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(this).setTitle(R.string.up_title).setMessage(sb.toString())
+                        .setPositiveButton(R.string.up_update, new DialogInterface.OnClickListener() {
                             
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 apkUp.downloadApk();
                             }
                             
-                        }).setNegativeButton("暂不更新", new DialogInterface.OnClickListener() {
+                        }).setNegativeButton(R.string.up_later, new DialogInterface.OnClickListener() {
                             
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
