@@ -3,21 +3,28 @@
 
     <string name="app_name">NFC Flower</string>
     <string name="action_settings">Settings</string>
-    <string name="about_us_weburl">Web：http://www.elecfreaks.com/</string>
-    <string name="about_us_email">Email：robi.wang@elecfreaks.com</string>
-    
-    <string name="app_copyright">Copyright © 2011-2014. All Rights Reserved.</string>
+    <string name="about_us_weburl">Web：https://github.com/awong1900/NFC-Flower</string>
+    <string name="about_us_email">Email：wangtengoo7@gmail.com</string>
+    <string name="app_copyright">Copyright © 2014. All Rights Reserved.</string>
     <string name="warning_write">Place the back of the device over the tag to write</string>
     <string name="water_flower">Water Flower</string>
     <string name="info_temperature">Temperature:</string>
-    <string name="info_humidity">Humidity":</string>
-    <string name="settting_humidity">Settting Humidity:</string>
+    <string name="info_humidity">Humidity:</string>
+    <string name="info_moisture">Moisture:</string>
+    <string name="settting_moisture">Settting Moisture:</string>
     <string name="settting_write_tag">Save</string>
-        <string name="write_failed">Failed to write，please try again later!</string>
+    <string name="write_failed">Failed to write，please try again later!</string>
     <string name="write_succ">Tag has been written successfully!</string>
+    <string name="up_title">Software Update</string>
+    <string name="up_old">Current version:</string>
+    <string name="up_new">,new version</string>
+    <string name="up_is_update">,update?</string>
+    <string name="up_update">Update</string>
+    <string name="up_later">Later</string>
     <string-array name="titles">
         <item>info</item>
         <item>setting</item>
         <item>about us</item>
     </string-array>
+
 </resources>

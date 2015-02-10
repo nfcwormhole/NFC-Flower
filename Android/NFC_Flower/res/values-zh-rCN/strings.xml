@@ -4,16 +4,23 @@
     <string name="app_name">NFC Flower</string>
     <string name="app_copyright">Copyright © 2011-2014. All Rights Reserved.</string>
     <string name="action_settings">设置</string>
-    <string name="about_us_weburl">网址：http://www.elecfreaks.com/</string>
-    <string name="about_us_email">邮箱：robi.wang@elecfreaks.com</string>
+    <string name="about_us_weburl">网址：https://github.com/awong1900/NFC-Flower</string>
+    <string name="about_us_email">邮箱：wangtengoo7@gmail.com</string>
     <string name="warning_write">将手机靠近NFC TAG开始写入</string>
     <string name="water_flower">浇花</string>
     <string name="info_temperature">温度:</string>
-    <string name="info_humidity">湿度:</string>
-    <string name="settting_humidity">湿度设置:</string>
+    <string name="info_humidity">空气湿度:</string>
+    <string name="info_moisture">土壤湿度:</string>
+    <string name="settting_moisture">土壤湿度设置(低于此湿度自动浇水):</string>
     <string name="settting_write_tag">保存</string>
-    <string name="write_succ">成功写入标签！</string>
     <string name="write_failed">写入失败，请稍候重试！</string>
+    <string name="write_succ">成功写入标签！</string>
+    <string name="up_title">软件更新</string>
+    <string name="up_old">当前版本:</string>
+    <string name="up_new">,发现新版本</string>
+    <string name="up_is_update">,是否更新?</string>
+    <string name="up_update">更新</string>
+    <string name="up_later">暂不更新</string>
 
     <string-array name="titles">
         <item>信息</item>

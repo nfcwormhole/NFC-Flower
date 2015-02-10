@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#EBEBEB"
     android:orientation="vertical" >
 
     <RelativeLayout
@@ -19,7 +19,7 @@
             android:layout_height="44dip"
             android:paddingLeft="5dip"
             android:paddingTop="12dip"
-            android:text="@string/settting_humidity" />
+            android:text="@string/settting_moisture" />
 
         <TextView
             android:id="@+id/humidity_text_display"
