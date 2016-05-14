@@ -26,18 +26,18 @@ import java.io.IOException;
 public class WriteTag extends Activity {
     // URL share
     public static final String WEB_URL_ADDRESS = "WEB_URL_ADDRESS";
-    
+
     // Theme share
     public static final String KONKA_THEME = "KONKA_THEME";
-    
+
     NfcAdapter nfcAdapter;
-    
+
     private boolean WriteMode = false;
-    
+
     String flower_type;
-    
+
     int flower_value;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +45,7 @@ public class WriteTag extends Activity {
         initData();
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
     }
-    
+
     private void initData() {
         Intent dataIntent = getIntent();
         flower_type = dataIntent.getStringExtra("flower");
@@ -53,11 +53,11 @@ public class WriteTag extends Activity {
         Log.d("sam test", "flower_type = " + flower_type);
         Log.d("sam test", "flower_value = " + flower_value);
     }
-    
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        
+
         Log.d("sam test", "WriteTag onNewIntent action = " + intent.getAction());
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
             Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
@@ -69,30 +69,30 @@ public class WriteTag extends Activity {
                 Toast.makeText(getApplicationContext(), getString(R.string.write_failed),
                         Toast.LENGTH_LONG).show();
             }
-            
+
         }
     }
-    
+
     public NdefMessage createNdefMessage() {
-        
+
         NdefRecord[] records = new NdefRecord[3];
-        
+
         // URI
         Uri uri = Uri.parse("http://www.elecfreaks.com");
         records[0] = NdefRecord.createUri(uri);
-        
+
         // record2
         byte bs[] = {(byte) flower_value};
         Log.d("sam test", "flower_value = " + bs[0]);
         records[1] = NdefRecord.createExternal("flower", flower_type, bs);
-        
+
         records[2] = NdefRecord.createApplicationRecord("com.flower.nfcaction");
         /** NDEF Message **/
         NdefMessage message = new NdefMessage(records);
         return message;
-        
+
     }
-    
+
     public boolean writeTag(NdefMessage message, Tag tag) {
         int size = message.toByteArray().length;
         try {
@@ -127,14 +127,14 @@ public class WriteTag extends Activity {
             return false;
         }
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
         Log.d("sam test", "nfc WriteMode = " + WriteMode);
         enableTagWriteMode();
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -145,13 +145,13 @@ public class WriteTag extends Activity {
         }
         super.onPause();
     }
-    
+
     private void enableTagWriteMode() {
         if (!WriteMode && nfcAdapter != null && nfcAdapter.isEnabled()) {
             WriteMode = true;
             Log.d("sam test", "nfc enableForegroundDispatch");
             IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-            IntentFilter[] mWriteTagFilters = new IntentFilter[] {tagDetected};
+            IntentFilter[] mWriteTagFilters = new IntentFilter[]{tagDetected};
             // Intent intent = new Intent(NfcAdapter.ACTION_TAG_DISCOVERED);
             PendingIntent mNfcPendingIntent =
                     PendingIntent.getActivity(this, 0,
